@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dashboard-demo
+  #dnamespace: kube-system
+spec:
+  rules:
+  - host: helloworld.mmm
+    http:
+      paths:
+      - path: helloworld.mmm/demo1  server-name:port
+        backend:
+          serviceName: rc-flask-demo-service
+          servicePort: 5000
+      - path: /demo2
+        backend:
+          serviceName: deploy-flask-demo-service
+          servicePort: 5000
+      - path: /demo3
+        backend:
+          serviceName: hello
+          servicePort: 80

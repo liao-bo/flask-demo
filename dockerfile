@@ -28,12 +28,12 @@ RUN apt-get install -y python-pip --fix-missing
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN mkdir /var/flask-demo && chmod -R 0777 /var/flask-demo
-VOLUME ["/var/flask-demo"]
+VOLUME ["/var/app"]
 
-ADD app.py /var/flask-demo
+ADD run.sh /var/run.sh
 
 EXPOSE 5000
+ENV APP_VERSION V1.0
 
-CMD python /var/flask-demo/app.py
+CMD chmod +x /var/run.sh && /var/run.sh
 

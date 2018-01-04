@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: deploy-flask-demo
+  labels:
+     name: deploy-flask-demo
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      name: deploy-flask-demo
+    #name: deploy-flask-demo
+  template:
+    metadata:
+      labels:
+          name: deploy-flask-demo
+    spec:
+        volumes:
+        - name: data
+          emptyDir: {}
+        containers:
+        - image: registry.cn-hangzhou.aliyuncs.com/flask-demo/flask-demo:2.0
+          name: flask-demo
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi
+          #livenessProbe:
+            #httpGet:
+              #path: /health
+              #port: 5000
+              #scheme: HTTP
+            #initialDelaySeconds: 60
+            #timeoutSeconds: 5
+            #successThreshold: 1
+            #failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          ports:
+          - containerPort: 5000
+          volumeMounts:
+          - name: data
+            mountPath: /var/app
+        - image: registry.cn-hangzhou.aliyuncs.com/flask-demo/flask-demo:git-update
+          name: flask-demo-git-update
+          volumeMounts:
+          - name: data
+            mountPath: /var/github

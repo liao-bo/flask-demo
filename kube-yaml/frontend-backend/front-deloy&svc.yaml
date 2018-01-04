@@ -1,0 +1,52 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: hello
+    tier: frontend
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 80
+    nodePort: 31111
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+      - name: nginx
+        image: "registry.cn-qingdao.aliyuncs.com/cktq/hello-frontend:1.0"
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx","-s","quit"]
+
+
+#upstream hello {
+#    server hello;
+#}
+
+#server {
+#    listen 80;
+
+#    location / {
+#        proxy_pass http://hello;
+#    }
+#}
+#
+#
+#
+#

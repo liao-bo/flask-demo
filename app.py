@@ -2,6 +2,7 @@
 from flask import Flask, jsonify, abort, request
 import datetime
 import socket
+import os
 
 NTP_hostname = socket.gethostname()
 
@@ -12,10 +13,11 @@ datecenter_timezone ={'SH': 'UTC+8',
                       'SYZ': 'UTC+10'
 
 }
-
+version = os.environ['APP_VERSION']
 web_time = {'UTC_time': '',
             'UTC_formad': "%Y-%m-%dT%H:%M:%S.%fZ",
-            'NTP_server': NTP_hostname
+            'NTP_server': NTP_hostname,
+            'VERSION':version
             }
 
 local_time = {'hostname': '',
@@ -37,7 +39,12 @@ def utc_format(date):
 
 @app.route('/')
 def index():
-    return "This is a demo for kubernete micservice"
+    return NTP_hostname
+
+
+@app.route('/health')
+def health():
+    return "This is a demo of kubernete micro-service"
 
 
 @app.route('/app/api/v1.0/UTC', methods=['GET'])
@@ -68,6 +75,7 @@ def local_timezone():
                   'NTP_info': web_time
                   }
         return jsonify(result)
+
 
 
 if __name__ == '__main__':

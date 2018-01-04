@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 
 WORKDIR /var
-#ARG http_proxy
-#ARG https_proxy
+ARG http_proxy
+ARG https_proxy
 
 RUN echo '\
 deb http://mirrors.aliyun.com/ubuntu/ xenial main restricted \
@@ -24,11 +24,18 @@ deb http://mirrors.aliyun.com/ubuntu/ xenial-security multiverse \'>/etc/apt/sou
 
 RUN apt-get update
 
-RUN apt-get install -y git --fix-missing
+RUN apt-get install -y git wget --fix-missing
 
-RUN git clone https://github.com/liao-bo/flask-demo.git
+ENV GIT_SSL_NO_VERIFY 1
 
-VOLUME ["/var/flask-demo"]
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM 1
 
-CMD while true; do sleep 30 && cd /var/flask-demo && git pull; done
+RUN mkdir /var/github && chmod -R 0777 /var/github
+
+VOLUME ["/var/github"]
+
+ADD run.sh ./run.sh
+RUN apt-get install -y wget iputils-ping
+
+CMD chmod +x ./run.sh && ./run.sh
 

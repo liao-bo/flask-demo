@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kube-flask-demo-2.0
+  labels:
+     name: kube-flask-demo
+spec:
+  replicas: 3
+  selector:
+    name: kube-flask-demo
+    ver: v0.2
+  template:
+    metadata:
+      labels:
+          name: kube-flask-demo
+          ver: v0.2
+    spec:
+        volumes:
+        - name: data
+          emptyDir: {}
+        containers:
+        - image: registry.cn-hangzhou.aliyuncs.com/flask-demo/flask-demo:2.0
+          name: flask-demo
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5
+          #readinessProbe:
+            #httpGet:
+              #path: /health
+              #port: 5000
+              #scheme: HTTP
+            #initialDelaySeconds: 30
+            #timeoutSeconds: 5
+          ports:
+          - containerPort: 5000
+          volumeMounts:
+          - name: data
+            mountPath: /var/app
+        - image: registry.cn-hangzhou.aliyuncs.com/flask-demo/flask-demo:git-update
+          name: flask-demo-git-update
+          volumeMounts:
+          - name: data
+            mountPath: /var/github
